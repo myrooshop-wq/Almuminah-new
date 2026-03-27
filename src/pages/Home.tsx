@@ -1,9 +1,19 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ArrowRight, BookOpen, GraduationCap, Heart, Star, CheckCircle, ChevronLeft, ChevronRight, Send, Camera, Palette, Shield, Zap, Cpu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { PageMeta } from '../lib/PageMeta';
 import { submitInquiry, fetchToppers, fetchEvents, fetchPrograms, fetchFaculty } from '../services/googleSheets';
+
+// Module-level cache — all sections share one fetch per session, no duplicate calls
+const _cache: Record<string, any> = {};
+async function cachedFetch(key: string, fetcher: () => Promise<any>) {
+  if (_cache[key] !== undefined) return _cache[key];
+  const data = await fetcher();
+  _cache[key] = data;
+  return data;
+}
 
 const TopperCarousel = () => {
   const [toppers, setToppers] = React.useState<any[]>([]);
@@ -12,7 +22,7 @@ const TopperCarousel = () => {
 
   React.useEffect(() => {
     const loadToppers = async () => {
-      const data = await fetchToppers();
+      const data = await cachedFetch('toppers', fetchToppers);
       setToppers(data);
       setLoading(false);
     };
@@ -211,9 +221,10 @@ const Hero = () => {
     <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-brand-green">
       <div className="absolute inset-0">
         <img 
-          src="https://images.unsplash.com/photo-1523050853064-85a17f009c5d?auto=format&fit=crop&q=80" 
-          alt="School Background" 
+          src="https://images.unsplash.com/photo-1523050853064-85a17f009c5d?auto=format&fit=crop&w=1400&q=75" 
+          alt="Al-Mu'minah School Surat — Islamic girls school campus"
           className="w-full h-full object-cover opacity-30"
+          loading="eager"
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-green/50 to-brand-green" />
@@ -287,9 +298,7 @@ const Hero = () => {
                   className="w-full bg-white/10 border border-white/20 rounded-xl px-5 py-4 text-brand-cream/60 focus:outline-none focus:border-brand-gold"
                 >
                   <option value="">Select Branch</option>
-                  <option value="mumbai">Mumbai Central</option>
-                  <option value="bandra">Bandra West</option>
-                  <option value="andheri">Andheri East</option>
+                  <option value="surat-main">Surat Main Branch</option>
                 </select>
                 <button 
                   type="submit"
@@ -346,7 +355,7 @@ const Programs = () => {
 
   React.useEffect(() => {
     const loadPrograms = async () => {
-      const data = await fetchPrograms();
+      const data = await cachedFetch('programs', fetchPrograms);
       if (data && data.length > 0) {
         setLevels(data);
       } else {
@@ -404,7 +413,7 @@ const Programs = () => {
               className="group cursor-pointer"
             >
               <div className="aspect-[3/4] rounded-3xl overflow-hidden relative mb-6 shadow-lg">
-                <img src={level.image} alt={level.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
+                <img src={level.image} alt={level.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" referrerPolicy="no-referrer" />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-green via-transparent to-transparent opacity-60" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="text-brand-gold text-[10px] font-bold uppercase tracking-widest mb-1">{level.grades || level.subtitle}</div>
@@ -428,8 +437,9 @@ const Mission = () => {
           <div className="relative">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80" 
-                alt="Students" 
+                src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=75" 
+                alt="Students studying at Al-Mu'minah School Surat" 
+                loading="lazy"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
@@ -442,8 +452,8 @@ const Mission = () => {
             <h2 className="text-4xl md:text-5xl font-serif text-brand-green leading-tight">
               A Visionary Approach to <span className="italic">Islamic Education</span>
             </h2>
-            <p className="text-brand-green/70 leading-relaxed italic text-lg">
-              "يَا أَيُّهَا الَّذِينَ آمَنُوا قُوا أَنْفُسَكُمْ وَأَهْلِيكُمْ نَارًا"
+            <p className="text-brand-green/70 leading-relaxed text-lg text-right">
+              <span lang="ar" dir="rtl">يَا أَيُّهَا الَّذِينَ آمَنُوا قُوا أَنْفُسَكُمْ وَأَهْلِيكُمْ نَارًا</span>
             </p>
             <p className="text-brand-green/70 leading-relaxed">
               AL-MU’MINAH GROUP OF SCHOOLS is an Islamic School; born out of the ideology that only worldly academic education is not sufficient for the ultimate success of a believer. Our mission is to provide excellence in both academic and Islamic education, preparing our girls for success in this world and the hereafter.
@@ -466,7 +476,7 @@ const Management = () => {
 
   React.useEffect(() => {
     const loadManagement = async () => {
-      const data = await fetchFaculty();
+      const data = await cachedFetch('faculty', fetchFaculty);
       if (data && data.length > 0) {
         // Filter members who have "Yes" in "show on homepage" (case-insensitive)
         const homeMembers = data.filter(m => 
@@ -560,7 +570,7 @@ const WhyChooseUs = () => {
           </div>
           <div className="relative">
             <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl border-8 border-white/10">
-              <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80" alt="Students" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=75" alt="Girls learning at Al-Mu'minah Islamic School Surat" loading="lazy" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand-gold rounded-full flex items-center justify-center text-brand-green font-serif text-2xl font-bold text-center p-4">
               20+ Years of Excellence
@@ -613,7 +623,7 @@ const News = () => {
 
   React.useEffect(() => {
     const loadEvents = async () => {
-      const data = await fetchEvents();
+      const data = await cachedFetch('events', fetchEvents);
       // Take the latest 3 events
       setItems(data.slice(0, 3));
       setLoading(false);
@@ -669,6 +679,10 @@ export const Home = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      <PageMeta
+        title="Al-Mu'minah School Surat | Islamic Girls School | SSC Board"
+        description="Al-Mu'minah School Surat — premier Islamic English medium girls school in Gujarat. Excellence in SSC academics + Quranic Arabic. Part of Al-Mu'minah Group of Schools. Admissions open 2026–27."
+      />
       <Hero />
       <Stats />
       <TopperCarousel />
