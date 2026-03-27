@@ -249,14 +249,22 @@ const Hero = () => {
               and spiritual growth.
             </p>
             <div className="flex flex-wrap gap-5">
-              <Link to="/admissions" className="px-10 py-5 bg-brand-gold text-brand-green font-bold rounded-full hover:bg-brand-cream transition-all flex items-center group shadow-xl shadow-brand-gold/20">
-                Apply for 2026-27 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-              </Link>
-              <Link to="/contact" className="px-10 py-5 border-2 border-brand-cream/30 text-brand-cream font-bold rounded-full hover:bg-brand-cream/10 transition-all">
+              <a 
+                href="https://wa.me/918888888888" 
+                target="_blank"
+                className="px-10 py-5 bg-[#25D366] text-white font-bold rounded-full hover:bg-[#1ebe5d] transition-all flex items-center group shadow-xl"
+              >
+                WHATSAPP <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </a>
+            
+              <Link 
+                to="/contact" 
+                className="px-10 py-5 border-2 border-brand-cream/30 text-brand-cream font-bold rounded-full hover:bg-brand-cream/10 transition-all"
+              >
                 Enquire Now
               </Link>
             </div>
-          </motion.div>
+            </motion.div>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
