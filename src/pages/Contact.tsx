@@ -16,22 +16,44 @@ const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'err
 const [contactInfo, setContactInfo] = React.useState<any>(null);
 const [loading, setLoading] = React.useState(true);
 
-// 🔥 Fetch contact details
+// 🔥 SAFE FETCH
 React.useEffect(() => {
 const loadContact = async () => {
 try {
 const data = await fetchContactDetails();
-if (data && data.length > 0) {
-setContactInfo(data[0]);
-}
-} catch (err) {
-console.error("Error fetching contact:", err);
-} finally {
-setLoading(false);
-}
+console.log("CONTACT DATA:", data);
+
+```
+    if (Array.isArray(data) && data.length > 0) {
+      setContactInfo(data[0]);
+    }
+  } catch (err) {
+    console.error("Error fetching contact:", err);
+  } finally {
+    setLoading(false);
+  }
 };
+
 loadContact();
+```
+
 }, []);
+
+// 🔥 SAFE FIELD ACCESS (case-insensitive)
+const getField = (obj: any, keys: string[]) => {
+if (!obj) return "";
+for (let key of keys) {
+if (obj[key] !== undefined) return obj[key];
+}
+return "";
+};
+
+const address = getField(contactInfo, ["address"]);
+const primaryPhone = getField(contactInfo, ["primaryphone", "primaryPhone"]);
+const secondaryPhone = getField(contactInfo, ["secondaryphone", "secondaryPhone"]);
+const email = getField(contactInfo, ["email"]);
+const logo = getField(contactInfo, ["logo", "Logo"]);
+const hours = getField(contactInfo, ["hours"]);
 
 const handleSubmit = async (e: React.FormEvent) => {
 e.preventDefault();
@@ -65,7 +87,7 @@ return (
 ```
   <PageMeta 
     title="Contact Al-Muminah School Surat | Admissions & Enquiry"
-    description="Get in touch with Al-Muminah School Surat for admissions, enquiries, and campus visits."
+    description="Get in touch with Al-Muminah School Surat for admissions and enquiries."
   />
 
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-20">
@@ -74,10 +96,10 @@ return (
     <div>
 
       {/* Logo */}
-      {contactInfo?.logo && (
+      {logo && (
         <img 
-          src={contactInfo.logo} 
-          alt="Al Muminah School Logo" 
+          src={logo} 
+          alt="School Logo" 
           className="h-16 mb-6"
         />
       )}
@@ -94,19 +116,23 @@ return (
           {/* Address */}
           <div className="flex items-start space-x-4">
             <MapPin />
-            <p>{contactInfo?.address}</p>
+            <p>{address || "Address not available"}</p>
           </div>
 
           {/* Phone */}
           <div className="flex items-start space-x-4">
             <Phone />
             <div>
-              <a href={`tel:${contactInfo?.primaryphone}`}>
-                {contactInfo?.primaryphone}
-              </a>
+              {primaryPhone ? (
+                <a href={`tel:${primaryPhone}`}>
+                  {primaryPhone}
+                </a>
+              ) : (
+                <p>Phone not available</p>
+              )}
 
-              {contactInfo?.secondaryphone && (
-                <p>{contactInfo.secondaryphone}</p>
+              {secondaryPhone && (
+                <p>{secondaryPhone}</p>
               )}
             </div>
           </div>
@@ -114,15 +140,19 @@ return (
           {/* Email */}
           <div className="flex items-start space-x-4">
             <Mail />
-            <a href={`mailto:${contactInfo?.email}`}>
-              {contactInfo?.email}
-            </a>
+            {email ? (
+              <a href={`mailto:${email}`}>
+                {email}
+              </a>
+            ) : (
+              <p>Email not available</p>
+            )}
           </div>
 
           {/* Hours */}
           <div className="flex items-start space-x-4">
             <Clock />
-            <p>{contactInfo?.hours}</p>
+            <p>{hours || "Timing not available"}</p>
           </div>
 
         </div>
@@ -132,7 +162,7 @@ return (
     {/* RIGHT SIDE FORM */}
     <div className="bg-white p-8 rounded-2xl shadow">
 
-      <h3 className="text-2xl font-semibold mb-6">Send us a Message</h3>
+      <h3 className="text-2xl font-semibold mb-6">Send Message</h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
