@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
+import { PageMeta } from '../lib/PageMeta';
 import { submitInquiry, fetchContactDetails } from '../services/googleSheets';
 
 export const Contact = () => {
@@ -51,6 +52,7 @@ export const Contact = () => {
       exit={{ opacity: 0 }}
       className="py-20"
     >
+      <PageMeta title="Contact Us | Al-Mu'minah School Surat | Admissions Enquiry" description="Contact Al-Mu'minah School Surat for admissions enquiries, campus visits, or general information. Call, email or fill our online form." />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
           <div>
@@ -72,9 +74,8 @@ export const Contact = () => {
                   <p className="text-brand-green/60 text-sm leading-relaxed">
                     {contactInfo?.address || (
                       <>
-                        45/47, Sheriff Devji Street (Chakla Street),<br />
-                        Near Zakaria Masjid, Mohammad Ali Road,<br />
-                        Mumbai – 400003
+                        Al-Mu'minah School, Surat,<br />
+                        Gujarat, India
                       </>
                     )}
                   </p>
