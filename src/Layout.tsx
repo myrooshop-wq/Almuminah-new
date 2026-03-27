@@ -215,28 +215,38 @@ const Footer = () => {
             <ul className="space-y-4 text-sm text-brand-cream/70">
               <li className="flex items-start space-x-3">
                 <MapPin size={18} className="text-brand-gold shrink-0" />
-                <span>{contact?.address || "45/47, Sheriff Devji Street (Chakla Street), Near Zakaria Masjid, Mohammad Ali Road, Mumbai – 400003"}</span>
+                <span>{contact?.address || "Al-Mu'minah School, Surat, Gujarat, India"}</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone size={18} className="text-brand-gold shrink-0" />
-                <span>{contact?.primaryphone || contact?.phone || "+91-022-23450702 / 03"}</span>
+                <a
+                  href={`tel:${(contact?.primaryphone || contact?.phone || '+912223450702').replace(/[^+\d]/g, '')}`}
+                  className="hover:text-brand-gold transition-colors"
+                >
+                  {contact?.primaryphone || contact?.phone || "+91 XXXXX XXXXX"}
+                </a>
               </li>
               {contact?.secondaryphone && (
                 <li className="flex items-center space-x-3">
                   <Phone size={18} className="text-brand-gold shrink-0 opacity-0" />
-                  <span>{contact.secondaryphone}</span>
+                  <a
+                    href={`tel:${contact.secondaryphone.replace(/[^+\d]/g, '')}`}
+                    className="hover:text-brand-gold transition-colors"
+                  >
+                    {contact.secondaryphone}
+                  </a>
                 </li>
               )}
               <li className="flex items-center space-x-3">
                 <Mail size={18} className="text-brand-gold shrink-0" />
-                <span>{contact?.email || "almuminah_school@yahoo.com"}</span>
+                <span>{contact?.email || "info@almuminahschool.org"}</span>
               </li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-brand-cream/10 pt-8 text-center text-xs text-brand-cream/40 uppercase tracking-widest font-georgia">
-          © {new Date().getFullYear()} AL-MU'MINAH GROUP OF SCHOOLS. All Rights Reserved.
+          © {new Date().getFullYear()} Al-Mu'minah School Surat | Al-Mu'minah Group of Schools. All Rights Reserved.
         </div>
       </div>
     </footer>
@@ -321,6 +331,11 @@ const ScrollNavigation = () => {
 };
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
+  const [layoutContact, setLayoutContact] = React.useState<any>(null);
+  React.useEffect(() => {
+    fetchContactDetails().then(data => { if (data) setLayoutContact(data); });
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <ScrollToTop />
@@ -331,12 +346,18 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       
       <ScrollNavigation />
       {/* Sticky Mobile CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden grid grid-cols-2 border-t border-brand-green/10">
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden grid grid-cols-3 border-t border-brand-green/10">
+        <a
+          href={`tel:${((layoutContact?.primaryphone || layoutContact?.phone || '+912223450702')).replace(/[^+\d]/g, '')}`}
+          className="bg-brand-green text-brand-cream py-4 text-center font-bold uppercase tracking-widest text-xs flex items-center justify-center space-x-2"
+        >
+          <Phone size={16} /> <span>Call</span>
+        </a>
         <Link to="/contact" className="bg-white text-brand-green py-4 text-center font-bold uppercase tracking-widest text-xs flex items-center justify-center space-x-2">
           <Mail size={16} /> <span>Enquire</span>
         </Link>
         <Link to="/admissions" className="bg-brand-gold text-brand-green py-4 text-center font-bold uppercase tracking-widest text-xs flex items-center justify-center space-x-2">
-          <FileText size={16} /> <span>Apply Now</span>
+          <FileText size={16} /> <span>Apply</span>
         </Link>
       </div>
 
